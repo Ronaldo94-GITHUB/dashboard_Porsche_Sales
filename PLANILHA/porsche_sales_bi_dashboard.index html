@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Porsche Sales BI</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#030303;
+      --surface:#0b0b0b;
+      --card:#111111;
+      --card-2:#171717;
+      --line:#2a2a2a;
+      --text:#f5f5f5;
+      --muted:#a3a3a3;
+      --muted-2:#737373;
+      --gold:#d4a72c;
+      --gold-2:#f5c542;
+      --green:#78e36d;
+      --red:#ff6b6b;
+      --shadow:0 24px 80px rgba(0,0,0,.65);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at 70% 0%, rgba(212,167,44,.16), transparent 28%), #030303;
+      color:var(--text);
+      font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x:hidden;
+    }
+
+    .app{
+      display:grid;
+      grid-template-columns:292px 1fr;
+      min-height:100vh;
+    }
+
+    aside{
+      position:sticky;
+      top:0;
+      height:100vh;
+      padding:30px 24px;
+      background:linear-gradient(180deg, rgba(10,10,10,.98), rgba(2,2,2,.98));
+      border-right:1px solid rgba(255,255,255,.09);
+      box-shadow:var(--shadow);
+      z-index:5;
+    }
+
+    .brand{
+      padding-bottom:28px;
+      border-bottom:1px solid var(--line);
+      margin-bottom:28px;
+    }
+
+    .crest{
+      width:52px;height:52px;
+      border:1px solid rgba(212,167,44,.5);
+      border-radius:16px;
+      display:grid;place-items:center;
+      color:var(--gold-2);
+      font-weight:900;
+      margin-bottom:16px;
+      background:linear-gradient(145deg, rgba(212,167,44,.18), rgba(255,255,255,.03));
+    }
+
+    .brand h1{
+      letter-spacing:5px;
+      font-size:22px;
+      font-weight:700;
+    }
+
+    .brand p{
+      margin-top:8px;
+      color:var(--gold-2);
+      letter-spacing:3px;
+      font-size:11px;
+      text-transform:uppercase;
+    }
+
+    .nav{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-bottom:28px;
+    }
+
+    .nav a{
+      color:#d8d8d8;
+      text-decoration:none;
+      padding:12px 14px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:14px;
+    }
+
+    .nav a.active, .nav a:hover{
+      background:linear-gradient(90deg, rgba(212,167,44,.18), rgba(255,255,255,.03));
+      color:#fff;
+      border:1px solid rgba(212,167,44,.25);
+    }
+
+    .filters-title{
+      color:var(--muted-2);
+      letter-spacing:4px;
+      text-transform:uppercase;
+      font-size:12px;
+      margin:20px 0 18px;
+    }
+
+    .filter{margin-bottom:16px}
+
+    label{
+      display:block;
+      color:#d7d7d7;
+      font-size:12px;
+      margin-bottom:8px;
+    }
+
+    select, input{
+      width:100%;
+      background:#070707;
+      color:#fff;
+      border:1px solid #2a2a2a;
+      border-radius:12px;
+      padding:13px 14px;
+      outline:none;
+    }
+
+    .date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+    .btn{
+      width:100%;
+      margin-top:12px;
+      padding:14px 16px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:800;
+      color:#0a0a0a;
+      background:linear-gradient(135deg, #b98a12, #f7d26b);
+      box-shadow:0 16px 40px rgba(212,167,44,.25);
+    }
+
+    main{
+      padding:34px;
+    }
+
+    .hero{
+      min-height:320px;
+      border-radius:32px;
+      overflow:hidden;
+      position:relative;
+      border:1px solid rgba(255,255,255,.1);
+      background:
+        linear-gradient(90deg, rgba(0,0,0,.88) 0%, rgba(0,0,0,.42) 48%, rgba(0,0,0,.2) 100%),
+        url('https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1800&q=80');
+      background-size:cover;
+      background-position:center;
+      box-shadow:var(--shadow);
+      margin-bottom:22px;
+    }
+
+    .hero-content{
+      position:absolute;
+      inset:0;
+      padding:52px 56px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      max-width:760px;
+    }
+
+    .eyebrow{
+      color:var(--gold-2);
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:18px;
+    }
+
+    .hero h2{
+      font-size:54px;
+      line-height:1.02;
+      letter-spacing:-2px;
+      max-width:690px;
+      font-weight:700;
+    }
+
+    .hero p{
+      color:#d0d0d0;
+      margin-top:18px;
+      max-width:520px;
+      line-height:1.7;
+      font-size:16px;
+    }
+
+    .topbar{
+      position:absolute;
+      top:24px;
+      right:28px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .pill{
+      background:rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.15);
+      backdrop-filter:blur(18px);
+      padding:12px 16px;
+      border-radius:14px;
+      color:#fff;
+      font-size:13px;
+    }
+
+    .icon-pill{
+      width:42px;height:42px;border-radius:50%;
+      background:rgba(0,0,0,.5);
+      border:1px solid rgba(255,255,255,.13);
+      display:grid;place-items:center;color:var(--gold-2);
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0, 1fr));
+      gap:16px;
+      margin-bottom:16px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:var(--radius);
+      padding:22px;
+      box-shadow:0 16px 50px rgba(0,0,0,.35);
+    }
+
+    .kpi-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color:#d8d8d8;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+
+    .kpi-icon{
+      width:34px;height:34px;border-radius:50%;
+      border:1px solid rgba(212,167,44,.45);
+      display:grid;place-items:center;
+      color:var(--gold-2);
+      background:rgba(212,167,44,.08);
+    }
+
+    .kpi-value{
+      font-size:28px;
+      font-weight:800;
+      margin:18px 0 8px;
+      letter-spacing:-.8px;
+    }
+
+    .kpi-sub{color:var(--muted);font-size:12px}.up{color:var(--green);font-weight:700}
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.2fr 1fr 310px;
+      gap:16px;
+      align-items:stretch;
+    }
+
+    .panel-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:14px;
+    }
+
+    .panel-title h3{
+      font-size:15px;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+    }
+
+    .panel-title p{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:4px;
+    }
+
+    .map-wrap{
+      display:grid;
+      grid-template-columns:1fr 250px;
+      gap:18px;
+      align-items:center;
+    }
+
+    .map{
+      height:250px;
+      border-radius:22px;
+      background:
+        radial-gradient(circle at 62% 70%, rgba(245,197,66,.7), transparent 3%),
+        radial-gradient(circle at 58% 58%, rgba(245,197,66,.6), transparent 2.5%),
+        radial-gradient(circle at 52% 64%, rgba(245,197,66,.5), transparent 2.5%),
+        radial-gradient(circle at 68% 54%, rgba(245,197,66,.4), transparent 2.5%),
+        linear-gradient(145deg, #242424, #0c0c0c);
+      border:1px solid #2b2b2b;
+      display:grid;place-items:center;
+      color:#777;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .map:before{
+      content:'BRASIL';
+      font-size:58px;
+      letter-spacing:8px;
+      font-weight:900;
+      color:rgba(255,255,255,.06);
+    }
+
+    .rank{display:flex;flex-direction:column;gap:11px}
+    .rank-row{display:grid;grid-template-columns:1fr auto;gap:12px;font-size:13px;border-bottom:1px solid #252525;padding-bottom:9px}
+    .dot{color:var(--gold-2);margin-right:8px}
+
+    .chart-card{min-height:312px}.chart-card canvas{max-height:250px}
+
+    .insights{display:flex;flex-direction:column;gap:12px}
+    .insight{
+      display:grid;
+      grid-template-columns:42px 1fr;
+      gap:12px;
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.075);
+    }
+    .insight-icon{width:42px;height:42px;border-radius:14px;background:rgba(212,167,44,.12);display:grid;place-items:center;color:var(--gold-2);font-size:20px}
+    .insight p{font-size:13px;line-height:1.55;color:#e4e4e4}
+
+    .bottom{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+
+    .table{width:100%;border-collapse:collapse;font-size:13px;color:#ddd}
+    .table th{color:var(--muted);font-weight:500;text-align:left;padding-bottom:12px;border-bottom:1px solid #282828}
+    .table td{padding:12px 0;border-bottom:1px solid #202020}
+    .table td:last-child{text-align:right;color:#fff;font-weight:700}
+
+    .progress{height:9px;background:#242424;border-radius:999px;overflow:hidden;margin-top:10px}
+    .progress span{display:block;height:100%;background:linear-gradient(90deg,#b98a12,#f7d26b);border-radius:999px}
+
+    @media(max-width:1180px){
+      .app{grid-template-columns:1fr}
+      aside{position:relative;height:auto}
+      .kpis,.grid,.bottom{grid-template-columns:1fr}
+      .map-wrap{grid-template-columns:1fr}
+      .hero h2{font-size:40px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">
+        <div class="crest">P</div>
+        <h1>PORSCHE</h1>
+        <p>Sales Intelligence</p>
+      </div>
+
+      <nav class="nav">
+        <a class="active" href="#">⌂ Visão Geral</a>
+        <a href="#">▣ Modelos</a>
+        <a href="#">⌖ Cidades</a>
+        <a href="#">▥ Vendas</a>
+        <a href="#">◉ Pagamentos</a>
+        <a href="#">✦ Insights IA</a>
+      </nav>
+
+      <div class="filters-title">Filtros</div>
+      <div class="filter">
+        <label>Modelo da Porsche</label>
+        <select id="modelFilter">
+          <option>Todos os modelos</option><option>Macan</option><option>Cayenne</option><option>911</option><option>Taycan</option><option>Panamera</option><option>718</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label>Model Year</label>
+        <select id="yearFilter">
+          <option>Todos os anos</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label>City</label>
+        <select id="cityFilter">
+          <option>Todas as cidades</option><option>São Paulo</option><option>Rio de Janeiro</option><option>Brasília</option><option>Curitiba</option><option>Belo Horizonte</option><option>Porto Alegre</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label>Pay Method</label>
+        <select id="payFilter">
+          <option>Todos os métodos</option><option>PIX</option><option>Financiamento</option><option>TED</option><option>Leasing</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label>Período</label>
+        <div class="date-row"><input type="text" value="01/01/2024"><input type="text" value="31/05/2024"></div>
+      </div>
+      <button class="btn" onclick="applyFilters()">APLICAR FILTROS</button>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <div class="topbar">
+          <div class="pill">01/01/2024 - 31/05/2024</div>
+          <div class="icon-pill">↗</div>
+          <div class="icon-pill">⚙</div>
+        </div>
+        <div class="hero-content">
+          <div class="eyebrow">Porsche Sales BI</div>
+          <h2>Performance que move decisões comerciais.</h2>
+          <p>Painel executivo para analisar vendas por modelo, cidade, ano do modelo e método de pagamento com insights inteligentes.</p>
+        </div>
+      </section>
+
+      <section class="kpis">
+        <div class="card"><div class="kpi-head">Receita Total <span class="kpi-icon">$</span></div><div class="kpi-value" id="revenue">R$ 12,45M</div><div class="kpi-sub"><span class="up">↑ 18,4%</span> vs período anterior</div></div>
+        <div class="card"><div class="kpi-head">Veículos Vendidos <span class="kpi-icon">▣</span></div><div class="kpi-value" id="vehicles">1.845</div><div class="kpi-sub"><span class="up">↑ 12,7%</span> vs período anterior</div></div>
+        <div class="card"><div class="kpi-head">Ticket Médio <span class="kpi-icon">◈</span></div><div class="kpi-value" id="ticket">R$ 674K</div><div class="kpi-sub"><span class="up">↑ 5,6%</span> vs período anterior</div></div>
+        <div class="card"><div class="kpi-head">Modelo Líder <span class="kpi-icon">★</span></div><div class="kpi-value" id="leader">Macan</div><div class="kpi-sub">Maior volume por cidade</div></div>
+        <div class="card"><div class="kpi-head">Market Share <span class="kpi-icon">●</span></div><div class="kpi-value">37,6%</div><div class="kpi-sub">categoria luxo</div><div class="progress"><span style="width:67%"></span></div></div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <div class="panel-title"><div><h3>Vendas por Cidade</h3><p>Receita total por cidade</p></div></div>
+          <div class="map-wrap">
+            <div class="map"></div>
+            <div class="rank">
+              <div class="rank-row"><span><span class="dot">•</span>São Paulo</span><strong>R$ 5,21M</strong></div>
+              <div class="rank-row"><span><span class="dot">•</span>Rio de Janeiro</span><strong>R$ 3,14M</strong></div>
+              <div class="rank-row"><span><span class="dot">•</span>Brasília</span><strong>R$ 2,45M</strong></div>
+              <div class="rank-row"><span><span class="dot">•</span>Curitiba</span><strong>R$ 1,78M</strong></div>
+              <div class="rank-row"><span><span class="dot">•</span>Belo Horizonte</span><strong>R$ 1,05M</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card chart-card">
+          <div class="panel-title"><div><h3>Principais Modelos por Cidade</h3><p>Quantidade de veículos vendidos</p></div><select style="width:130px;padding:9px"><option>São Paulo</option><option>Rio</option><option>Brasília</option></select></div>
+          <canvas id="modelsChart"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="panel-title"><div><h3>Insights Inteligentes</h3><p>Gerado por IA</p></div></div>
+          <div class="insights" id="insights">
+            <div class="insight"><div class="insight-icon">🏆</div><p>Macan é o modelo líder em São Paulo, representando 38% das vendas no período.</p></div>
+            <div class="insight"><div class="insight-icon">📈</div><p>Model Year 2025 apresenta crescimento de 22% em comparação ao período anterior.</p></div>
+            <div class="insight"><div class="insight-icon">💳</div><p>Clientes via PIX possuem ticket médio 14% maior que outros métodos.</p></div>
+            <div class="insight"><div class="insight-icon">⚠</div><p>Taycan teve queda de 8% nas vendas da região Sul.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom">
+        <div class="card chart-card"><div class="panel-title"><div><h3>Evolução de Vendas</h3><p>Quantidade de veículos por período</p></div></div><canvas id="trendChart"></canvas></div>
+        <div class="card chart-card"><div class="panel-title"><div><h3>Model Year Analytics</h3><p>Qual ano de modelo mais saiu</p></div></div><canvas id="yearChart"></canvas></div>
+        <div class="card chart-card"><div class="panel-title"><div><h3>Métodos de Pagamento</h3><p>Participação nas vendas</p></div></div><canvas id="payChart"></canvas></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const gold = '#d4a72c';
+    const gold2 = '#f5c542';
+    const grid = 'rgba(255,255,255,.08)';
+    Chart.defaults.color = '#cfcfcf';
+    Chart.defaults.borderColor = grid;
+    Chart.defaults.font.family = 'Inter';
+
+    new Chart(document.getElementById('modelsChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Macan','Cayenne','911','Taycan','Panamera','718'],
+        datasets: [{ data: [512,398,287,198,145,78], backgroundColor: ['#f5c542','#d4a72c','#b98a12','#9f7610','#7f5d0c','#5f4609'], borderRadius: 6 }]
+      },
+      options: { indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{color:grid}}, y:{grid:{display:false}}}, responsive:true, maintainAspectRatio:false }
+    });
+
+    new Chart(document.getElementById('trendChart'), {
+      type: 'line',
+      data: { labels:['Jan/24','Fev/24','Mar/24','Abr/24','Mai/24'], datasets:[{ data:[1203,1342,1568,1823,1845], borderColor:gold2, backgroundColor:'rgba(212,167,44,.22)', fill:true, tension:.42, pointBackgroundColor:'#fff', pointBorderColor:gold2, pointRadius:4 }] },
+      options:{ plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{color:grid}}}, responsive:true, maintainAspectRatio:false }
+    });
+
+    new Chart(document.getElementById('yearChart'), {
+      type:'bar',
+      data:{ labels:['2021','2022','2023','2024','2025'], datasets:[{ data:[112,284,512,678,259], backgroundColor:['#7f5d0c','#9f7610','#b98a12','#f5c542','#d4a72c'], borderRadius:8 }] },
+      options:{ plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{color:grid}}}, responsive:true, maintainAspectRatio:false }
+    });
+
+    new Chart(document.getElementById('payChart'), {
+      type:'doughnut',
+      data:{ labels:['PIX','Financiamento','TED','Leasing','Outros'], datasets:[{ data:[42,34,15,6,3], backgroundColor:['#f5c542','#d4a72c','#a3a3a3','#737373','#404040'], borderColor:'#111', borderWidth:4 }] },
+      options:{ cutout:'66%', plugins:{legend:{position:'right', labels:{boxWidth:10, usePointStyle:true}}}, responsive:true, maintainAspectRatio:false }
+    });
+
+    function applyFilters(){
+      const model = document.getElementById('modelFilter').value;
+      const year = document.getElementById('yearFilter').value;
+      const city = document.getElementById('cityFilter').value;
+      const pay = document.getElementById('payFilter').value;
+
+      document.getElementById('leader').textContent = model === 'Todos os modelos' ? 'Macan' : model;
+      document.getElementById('vehicles').textContent = model === 'Todos os modelos' ? '1.845' : '512';
+      document.getElementById('revenue').textContent = city === 'Todas as cidades' ? 'R$ 12,45M' : 'R$ 5,21M';
+      document.getElementById('ticket').textContent = pay === 'PIX' ? 'R$ 768K' : 'R$ 674K';
+
+      document.getElementById('insights').innerHTML = `
+        <div class="insight"><div class="insight-icon">🏆</div><p>${model === 'Todos os modelos' ? 'Macan' : model} aparece como destaque em ${city === 'Todas as cidades' ? 'São Paulo' : city}, com forte participação no período.</p></div>
+        <div class="insight"><div class="insight-icon">📈</div><p>${year === 'Todos os anos' ? 'Model Year 2025' : 'Model Year ' + year} concentra o maior potencial de vendas no recorte selecionado.</p></div>
+        <div class="insight"><div class="insight-icon">💳</div><p>${pay === 'Todos os métodos' ? 'PIX e Financiamento' : pay} apresenta comportamento relevante no ticket médio da carteira.</p></div>
+        <div class="insight"><div class="insight-icon">✦</div><p>Insight comercial: priorizar SUVs premium nas cidades com maior volume pode elevar a conversão.</p></div>
+      `;
+    }
+  </script>
+</body>
+</html>
