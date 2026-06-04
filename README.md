@@ -105,11 +105,6 @@ dashboard-porsche-sales/
 
 **Ronaldo Augusto Sabino**
 
-* Inspetor de Qualidade | Dexco
-* Bacharel em Engenharia de Software
-* MBA em Gestão de Projetos e Metodologias Ágeis
-* Lean Six Sigma Green Belt
-
 LinkedIn:
 https://www.linkedin.com/in/ronaldo-a-sabino-381a07213
 
