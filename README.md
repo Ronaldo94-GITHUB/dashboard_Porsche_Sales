@@ -1,5 +1,9 @@
 # 🚗 Porsche Sales Intelligence Dashboard
 
+---
+![Capa do Projeto](<img width="1851" height="557" alt="Capa png" src="https://github.com/user-attachments/assets/56a3a8a2-4a70-4594-bc01-4640e5dce1ef" />
+)
+
 <p align="center">
   <img src="assets/imagens/capa-dashboard.png" width="100%">
 </p>
