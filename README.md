@@ -133,8 +133,7 @@ dashboard-porsche-sales/
 
 ---
 
-![dashboard porsche](<img width="522" height="797" alt="imagem projeto Porsche png" src="https://github.com/user-attachments/assets/0a51b422-76b8-4a4b-987d-09b8b0d3857b" />
-)
+![dashboard porsche]( Porsche.png)
 
 # 🌐 Publicação
 
