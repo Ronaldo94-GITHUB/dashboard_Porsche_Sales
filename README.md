@@ -133,7 +133,7 @@ dashboard-porsche-sales/
 
 ---
 
-![dashboard porsche](assets_Porsche.png)
+![dashboard porsche](assetsPorsche.png)
 
 ---
 
