@@ -133,10 +133,6 @@ dashboard-porsche-sales/
 
 ---
 
-![dashboard porsche](assetsPorsche.png)
-
----
-
 # 🌐 Publicação
 
 O projeto pode ser publicado utilizando GitHub Pages.
