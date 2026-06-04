@@ -81,14 +81,6 @@ Geração automática de observações estratégicas a partir dos filtros seleci
 
 ---
 
-# 🖥️ Preview
-
-<p align="center">
-  <img src="docs/preview.png" width="100%">
-</p>
-
----
-
 # 🏗️ Estrutura do Projeto
 
 ```text
